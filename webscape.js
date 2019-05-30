@@ -7,7 +7,7 @@ const collegesURL = ['menuSamp.asp?locationNum=40&locationName=Colleges+Nine+%26
 'menuSamp.asp?locationNum=20&locationName=Crown+Merrill+Dining+Hall&sName=&naFlag=',
 'menuSamp.asp?locationNum=25&locationName=Porter+Kresge+Dining+Hall&sName=&naFlag=',
 'menuSamp.asp?locationNum=30&locationName=Rachel+Carson+Oakes+Dining+Hall&sName=&naFlag='];
-var dataList = [];
+
 const fetchFood = function(){
     collegesURL.forEach((collegeURL) => {
         request(baseURL + collegeURL, (error, response, html) => {
@@ -18,14 +18,13 @@ const fetchFood = function(){
                     college: baseURL + collegeURL,
                     food: foodElement.text()
                 };
-                dataList.push(dataNode);
+                console.log(dataNode);
             }
         });
     })    
-    return dataList;
 }
 
-console.log(fetchFood());
+fetchFood();
 
 
 
