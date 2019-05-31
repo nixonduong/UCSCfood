@@ -4,6 +4,7 @@ var assert = require('assert');
 
 const cheerio = require('cheerio');
 const request = require('request');
+const rp = require('request-promise');
 
 var port = 5000;
 var app = express();
@@ -17,6 +18,37 @@ const collegesURL = ['menuSamp.asp?locationNum=40&locationName=Colleges+Nine+%26
 'menuSamp.asp?locationNum=25&locationName=Porter+Kresge+Dining+Hall&sName=&naFlag=',
 'menuSamp.asp?locationNum=30&locationName=Rachel+Carson+Oakes+Dining+Hall&sName=&naFlag='];
 
+
+// Need to add the collegesURL to returned object (line 29)
+const fetchFood = async () => {
+    let combinedUrls = collegesURL.map(collegeUrl => `${baseURL}${collegeUrl}`);
+    let responses = await Promise.all(combinedUrls.map(async url => await rp({uri: url})));
+    let $$ = responses.map(response => cheerio.load(response))
+    return $$.map($ => {
+        return {
+            college: baseURL,
+            food: $('div.menusamprecipes').text()
+        }
+    })
+}
+
+const showFood = async () => {
+    const data = await fetchFood();
+}
+
+
+app.post('/submit', (req, res) => {
+    console.log(req.body.foodSearch);
+    fetchFood();
+	res.redirect('/');
+});
+
+app.listen(port, () => {
+	console.log("Server listening on port " + port + "...");
+});
+
+
+/*
 const fetchFood = function(){
     collegesURL.forEach((collegeURL) => {
         request(baseURL + collegeURL, (error, response, html) => {
@@ -32,13 +64,4 @@ const fetchFood = function(){
         });
     })    
 }
-
-app.post('/submit', (req, res) => {
-    console.log(req.body.foodSearch);
-    fetchFood();
-	res.redirect('/');
-});
-
-app.listen(port, () => {
-	console.log("Server listening on port " + port + "...");
-});
+*/
